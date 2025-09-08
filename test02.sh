@@ -7,7 +7,7 @@ show_menu() {
     echo "1) Disable Bluetooth"
     echo "2) Set CPU to Performance"
     echo "3) Reduce Swappiness"
-    echo "4) Disable Desktop Animations"
+    echo "4) Clean Cache and more"
     echo "5) Exit"
     echo -n "Choose an option: "
 }
@@ -35,8 +35,25 @@ vm.swappiness=10
 EOF
             ;;
         4)
-            echo "Disabling desktop animations..."
-            gsettings set org.gnome.desktop.interface enable-animations false
+           echo "Clearing Cache"
+           # Clear apt cache
+apt-get clean
+apt-get autoclean
+
+# Clear thumbnail cache
+rm -rf ~/.cache/thumbnails/*
+
+# Clear tmp directories
+rm -rf /tmp/*
+rm -rf /var/tmp/*
+
+# Clear old logs
+find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
+find /var/log -type f -name "*.gz" -delete
+
+# Clear systemd journal
+journalctl --rotate
+journalctl --vacuum-time=3d
             ;;
         5)
             echo "Exiting..."
